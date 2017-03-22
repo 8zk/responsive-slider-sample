@@ -74,13 +74,9 @@ $(function() {
 
   startTimer();
 
-  $stop.on('click', function() {
-    stopTimer();
-  });
+  $stop.on('click', stopTimer);
 
-  $start.on('click', function() {
-    startTimer();
-  });
+  $start.on('click',　startTimer);
 });
 </script>
 </body>
