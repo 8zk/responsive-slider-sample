@@ -2,10 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta content="width=device-width,initial-scale=1" name="viewport">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <title>Slider</title>
 <style>
 .keyvisual {
+  position: relative;
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
@@ -27,6 +29,36 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+.btn-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+.btn {
+  display: inline-block;
+  padding: 10px;
+  color: #ccc;
+  border-radius: 5px;
+  border: 1px #ccc solid;
+  cursor: pointer;
+}
+.arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: 0;
+  height: 0;
+  border: 20px transparent solid;
+  cursor: pointer;
+}
+.arrow.prev {
+  left: 10px;
+  border-right-color: #fff; 
+}
+.arrow.next {
+  right: 10px;
+  border-left-color: #fff;
+}
 @media (max-width: 768px) {
   .sliderItem {
     height: 200px;
@@ -42,25 +74,31 @@
     <li class="sliderItem" style="background-image: url(https://placehold.jp/ffe11a/ffffff/1000x400.png?text=NO.3);"></li>
     <li class="sliderItem" style="background-image: url(https://placehold.jp/fd7400/ffffff/1000x400.png?text=NO.4);"></li>
   </ul>
+  <span class="arrow prev"></span>
+  <span class="arrow next"></span>
 </div>
-<div class="stop">ストップ</div>
-<div class="start">スタート</div>
+<div class="btn-wrapper">
+  <div class="btn stop">STOP</div>
+  <div class="btn start">START</div>
+</div>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
 $(function() {
   var INTERVAL_TIME = 2000;
   var ANIMATION_TIME = 500;
   var $slider = $('.slider');
-  var $sliderItem;
-  var sliderItemWidth;
   var $stop = $('.stop');
   var $start = $('.start');
+  var $prev = $('.prev');
+  var $next = $('.next');
+  var touchEvent = document.ontouchstart === null ? 'touchstart' : 'click';
   var timer;
 
   function startTimer() {
     timer = setInterval(function() {
-      $sliderItem = $('.sliderItem');
-      sliderItemWidth = $sliderItem.width();
+      var $sliderItem = $('.sliderItem');
+      var sliderItemWidth = $sliderItem.width();
+
       $slider.animate({ left: - sliderItemWidth }, ANIMATION_TIME, function() {
         $slider.append($sliderItem.first());
         $slider.css({ left: 0 });
@@ -74,9 +112,32 @@ $(function() {
 
   startTimer();
 
-  $stop.on('click', stopTimer);
+  $stop.on(touchEvent, stopTimer);
+  $start.on(touchEvent,　startTimer);
+  $prev.on(touchEvent, function() {
+    var $sliderItem = $('.sliderItem');
+    var sliderItemWidth = $sliderItem.width();
 
-  $start.on('click',　startTimer);
+    if ($slider.not(':animated').length) {
+      stopTimer();
+      $slider.prepend($sliderItem.last());
+      $slider.css({ left: - sliderItemWidth });
+      $slider.animate({ left: 0 }, ANIMATION_TIME, startTimer);
+    }
+  });
+  $next.on(touchEvent, function() {
+    var $sliderItem = $('.sliderItem');
+    var sliderItemWidth = $sliderItem.width();
+
+    if ($slider.not(':animated').length) {
+      stopTimer();
+      $slider.animate({ left: - sliderItemWidth }, ANIMATION_TIME, function() {
+        $slider.append($sliderItem.first());
+        $slider.css({ left: 0 });
+        startTimer();
+      });
+    }
+  });
 });
 </script>
 </body>
