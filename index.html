@@ -2,37 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta content="width=device-width,initial-scale=1" name="viewport">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+<link rel="stylesheet" href="style.css">
 <title>Slider</title>
-<style>
-.keyvisual {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  overflow: hidden;
-}
-.slider {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 10000%;
-  font-size: 0;
-}
-.sliderItem {
-  display: inline-block;
-  width: 100vw;
-  max-width: 1000px;
-  height: 400px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-@media (max-width: 768px) {
-  .sliderItem {
-    height: 200px;
-  }
-}
-</style>
 </head>
 <body>
 <div class="keyvisual">
@@ -42,42 +15,14 @@
     <li class="sliderItem" style="background-image: url(https://placehold.jp/ffe11a/ffffff/1000x400.png?text=NO.3);"></li>
     <li class="sliderItem" style="background-image: url(https://placehold.jp/fd7400/ffffff/1000x400.png?text=NO.4);"></li>
   </ul>
+  <span class="arrow prev"></span>
+  <span class="arrow next"></span>
 </div>
-<div class="stop">ストップ</div>
-<div class="start">スタート</div>
+<div class="btn-wrapper">
+  <div class="btn stop">STOP</div>
+  <div class="btn start">START</div>
+</div>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script>
-$(function() {
-  var INTERVAL_TIME = 2000;
-  var ANIMATION_TIME = 500;
-  var $slider = $('.slider');
-  var $sliderItem;
-  var sliderItemWidth;
-  var $stop = $('.stop');
-  var $start = $('.start');
-  var timer;
-
-  function startTimer() {
-    timer = setInterval(function() {
-      $sliderItem = $('.sliderItem');
-      sliderItemWidth = $sliderItem.width();
-      $slider.animate({ left: - sliderItemWidth }, ANIMATION_TIME, function() {
-        $slider.append($sliderItem.first());
-        $slider.css({ left: 0 });
-      });
-    }, INTERVAL_TIME);
-  }
-
-  function stopTimer() {
-    clearInterval(timer);
-  }
-
-  startTimer();
-
-  $stop.on('click', stopTimer);
-
-  $start.on('click',　startTimer);
-});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
