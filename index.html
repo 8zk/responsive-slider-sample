@@ -6,6 +6,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <title>Slider</title>
 <style>
+body {
+  width: 100vw;
+}
 .keyvisual {
   position: relative;
   width: 100%;
@@ -84,9 +87,10 @@
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
 $(function() {
-  var INTERVAL_TIME = 2000;
-  var ANIMATION_TIME = 500;
+  var MAX_WIDTH = 1000;
+  var INTERVAL_TIME = 3000;
   var $slider = $('.slider');
+  var $sliderItem = $('.sliderItem');
   var $stop = $('.stop');
   var $start = $('.start');
   var $prev = $('.prev');
@@ -94,50 +98,79 @@ $(function() {
   var touchEvent = document.ontouchstart === null ? 'touchstart' : 'click';
   var timer;
 
-  function startTimer() {
-    timer = setInterval(function() {
-      var $sliderItem = $('.sliderItem');
-      var sliderItemWidth = $sliderItem.width();
+  function getStyle(option) {
+    return {
+      left: option.isNext ? ($(window).width() < MAX_WIDTH ? '-100vw' : - MAX_WIDTH) : 0,
+      transition: option.isAnimation ? 'all 0.5s' : 'initial',
+    };
+  }
 
-      $slider.animate({ left: - sliderItemWidth }, ANIMATION_TIME, function() {
-        $slider.append($sliderItem.first());
-        $slider.css({ left: 0 });
-      });
+  function startTimer() {
+    if (timer) {
+      return;
+    }
+    timer = setInterval(function() {
+      $slider.css(getStyle({
+        isNext: true,
+        isAnimation: true,
+      }));
     }, INTERVAL_TIME);
   }
 
   function stopTimer() {
     clearInterval(timer);
+    timer = null;
+  }
+
+  function moveRight() {
+    if ($slider.not(':animated').length) {
+      stopTimer();
+      $slider.css(getStyle({
+        isNext: true,
+        isAnimation: true,
+      }));
+    }
+  }
+
+  function moveLeft() {
+    if ($slider.not(':animated').length) {
+      stopTimer();
+      $sliderItem = $('.sliderItem');
+      $slider.prepend($sliderItem.last());
+      $slider.css(getStyle({
+        isNext: true,
+        isAnimation: false,
+      }));
+      setTimeout(function() {
+        $slider.css(getStyle({
+          isNext: false,
+          isAnimation: true,
+        }));
+      }, 0);
+    }
+  }
+
+  function endTransition(e) {
+    var isNextAnimation = parseInt(e.target.style.left, 10);
+
+    $slider.css(getStyle({
+      isNext: false,
+      isAnimation: false,
+    }));
+    if (isNextAnimation) {
+      $sliderItem = $('.sliderItem');
+      $slider.append($sliderItem.first());
+    }
+    startTimer();
   }
 
   startTimer();
 
   $stop.on(touchEvent, stopTimer);
-  $start.on(touchEvent,　startTimer);
-  $prev.on(touchEvent, function() {
-    var $sliderItem = $('.sliderItem');
-    var sliderItemWidth = $sliderItem.width();
-
-    if ($slider.not(':animated').length) {
-      stopTimer();
-      $slider.prepend($sliderItem.last());
-      $slider.css({ left: - sliderItemWidth });
-      $slider.animate({ left: 0 }, ANIMATION_TIME, startTimer);
-    }
-  });
-  $next.on(touchEvent, function() {
-    var $sliderItem = $('.sliderItem');
-    var sliderItemWidth = $sliderItem.width();
-
-    if ($slider.not(':animated').length) {
-      stopTimer();
-      $slider.animate({ left: - sliderItemWidth }, ANIMATION_TIME, function() {
-        $slider.append($sliderItem.first());
-        $slider.css({ left: 0 });
-        startTimer();
-      });
-    }
-  });
+  $start.on(touchEvent, startTimer);
+  $prev.on(touchEvent, moveLeft);
+  $next.on(touchEvent, moveRight);
+  $slider.on('transitionend', endTransition);
 });
 </script>
 </body>
