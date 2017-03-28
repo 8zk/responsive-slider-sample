@@ -2,7 +2,6 @@ $(function() {
   var MAX_WIDTH = 1000;
   var INTERVAL_TIME = 3000;
   var $slider = $('.slider');
-  var $sliderItem = $('.sliderItem');
   var $stop = $('.stop');
   var $start = $('.start');
   var $prev = $('.prev');
@@ -15,6 +14,15 @@ $(function() {
       left: option.isNext ? ($(window).width() < MAX_WIDTH ? '-100vw' : - MAX_WIDTH) : 0,
       transition: option.isAnimation ? 'all 0.5s' : 'initial',
     };
+  }
+
+  function checkIsNotAnimation() {
+    var transition = $slider[0].style.transition;
+    
+    return (
+      transition === '' ||
+      transition === 'initial'
+    );
   }
 
   function startTimer() {
@@ -35,7 +43,7 @@ $(function() {
   }
 
   function moveRight() {
-    if ($slider.not(':animated').length) {
+    if (checkIsNotAnimation()) {
       stopTimer();
       $slider.css(getStyle({
         isNext: true,
@@ -45,10 +53,9 @@ $(function() {
   }
 
   function moveLeft() {
-    if ($slider.not(':animated').length) {
+    if (checkIsNotAnimation()) {
       stopTimer();
-      $sliderItem = $('.sliderItem');
-      $slider.prepend($sliderItem.last());
+      $slider.prepend($slider.find('.sliderItem').last());
       $slider.css(getStyle({
         isNext: true,
         isAnimation: false,
@@ -70,8 +77,7 @@ $(function() {
       isAnimation: false,
     }));
     if (isNextAnimation) {
-      $sliderItem = $('.sliderItem');
-      $slider.append($sliderItem.first());
+      $slider.append($slider.find('.sliderItem').first());
     }
     startTimer();
   }
